@@ -24,6 +24,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -72,11 +73,21 @@ public class Player extends AppCompatActivity {
 
     private LightSensorListener lightSensorListener;
 
-    public String LIGHT_SENSOR_FILE_NAME="light_sensor_data.csv";
+    public TextView title;
 
-    public String GYRO_SENSOR_FILE_NAME="gyro_sensor_data.csv";
+    public int accelerometerTimes = 0;
 
-    public String ACCELEROMETER_SENSOR_FILE_NAME="accelerometer_sensor_data.csv";
+    public int gyroTimes = 0;
+
+    public int lightTimes = 0;
+
+    public String LIGHT_SENSOR_FILE_NAME="big_buck_bunny_light_sensor_data_"+accelerometerTimes+".csv";
+
+    public String GYRO_SENSOR_FILE_NAME="big_buck_bunny_gyro_sensor_data_"+gyroTimes+".csv";
+
+    public String ACCELEROMETER_SENSOR_FILE_NAME="big_buck_bunny_accelerometer_sensor_data_"+lightTimes+".csv";
+
+
 
     public boolean isHasStartedWriting() {
         return hasStartedWriting;
@@ -92,8 +103,10 @@ public class Player extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
+        Intent intent = getIntent();
+
+        super.onCreate(savedInstanceState);
         if (ContextCompat.checkSelfPermission(Player.this,
                 Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(Player.this,
@@ -139,7 +152,8 @@ public class Player extends AppCompatActivity {
 
         getSupportActionBar().setTitle(v.getTitle());
 
-        TextView title = findViewById(R.id.videoTitle);
+
+        title = findViewById(R.id.videoTitle);
         TextView desc = findViewById(R.id.videoDesc);
 
         title.setText(v.getTitle());
@@ -147,6 +161,7 @@ public class Player extends AppCompatActivity {
         Uri videoUrl = Uri.parse(v.getVideoUrl());
 
         fullScreenOp.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "Clicked on play");
@@ -159,6 +174,7 @@ public class Player extends AppCompatActivity {
             }
         });
 
+        hasStartedWriting = true;
 
     }
 
@@ -216,6 +232,7 @@ public class Player extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        hasStartedWriting = false;
         fullScreenOp.setVisibility(View.VISIBLE);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getSupportActionBar().show();
@@ -228,6 +245,7 @@ public class Player extends AppCompatActivity {
         if(orientation == Configuration.ORIENTATION_PORTRAIT){
             super.onBackPressed();
         }
+
     }
 
     private final MediaSource buildMediaSource() {
@@ -271,7 +289,7 @@ public class Player extends AppCompatActivity {
         if (this.isFinishing()) {
             this.releasePlayer();
         }
-
+        hasStartedWriting = false;
     }
 
     private final void releasePlayer() {
@@ -279,6 +297,7 @@ public class Player extends AppCompatActivity {
         if (simpleExoPlayer != null) {
             simpleExoPlayer.release();
         }
-
+        hasStartedWriting = false;
     }
+
 }

@@ -1,13 +1,20 @@
 package com.stonybrook.videoplayer;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -42,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
     VideoAdapter adapter;
     List<Video> all_videos;
 
-
     private SensorManager sensorManager;
 
     private Sensor gyroscope;
@@ -67,11 +73,11 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean hasStartedWriting=false;
 
-    public static final String LIGHT_SENSOR_FILE_NAME="light_sensor_data.csv";
+    public String LIGHT_SENSOR_FILE_NAME="big_buck_bunny_light_sensor_data.csv";
 
-    public static final String GYRO_SENSOR_FILE_NAME="gyro_sensor_data.csv";
+    public String GYRO_SENSOR_FILE_NAME="big_buck_bunny_gyro_sensor_data.csv";
 
-    public static final String ACCELEROMETER_SENSOR_FILE_NAME="accelerometer_sensor_data.csv";
+    public String ACCELEROMETER_SENSOR_FILE_NAME="big_buck_bunny_accelerometer_sensor_data.csv";
 
     private int STORAGE_PERMISSION_CODE = 1;
 
@@ -83,10 +89,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         if (ContextCompat.checkSelfPermission(MainActivity.this,
                 Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(MainActivity.this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.MANAGE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
         ) {
             /////Toast.makeText(MainActivity.this, "You have already granted this permission!",
             //      Toast.LENGTH_SHORT).show();
@@ -102,13 +111,34 @@ public class MainActivity extends AppCompatActivity {
         videoList.setAdapter(adapter);
         getJsonData();
 
+
+
+    }
+
+    public void openVideoList (View v){
+        Intent intent = new Intent(this, Player.class);
+        startActivity(intent);
     }
 
     private void requestStoragePermission() {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                if(!Environment.isExternalStorageManager()){
+//                    Uri uri = Uri.parse(this.getPackageName());
+
+                    startActivity(new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION));
+//                    startActivity(new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri));
+                }
+            }
+
+
         if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE)&&
                 ActivityCompat.shouldShowRequestPermissionRationale(this,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE) &&
+                ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.MANAGE_EXTERNAL_STORAGE)
+
                 ) {
 
             new AlertDialog.Builder(this)
@@ -131,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
 
         } else {
             ActivityCompat.requestPermissions(this,
-                    new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);
+                    new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.MANAGE_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);
         }
     }
 

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Video Player</string>
+    <string name="VideoList">Video List</string>
+    <string name="CSV_Files">File Viewer</string>
 </resources>

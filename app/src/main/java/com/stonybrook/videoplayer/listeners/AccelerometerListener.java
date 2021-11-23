@@ -3,12 +3,14 @@ package com.stonybrook.videoplayer.listeners;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.os.Environment;
 import android.util.Log;
 
 
 import com.opencsv.CSVWriter;
 import com.stonybrook.videoplayer.MainActivity;
 import com.stonybrook.videoplayer.Player;
+import com.stonybrook.videoplayer.R;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -65,7 +67,7 @@ public class AccelerometerListener implements SensorEventListener {
                     data[i+1]=String.valueOf(sensorValues[i]);
                 }
                 writer.writeNext(data);
-                Log.d(TAG,"Writing data to"+mainActivity.ACCELEROMETER_SENSOR_FILE_NAME);
+                Log.d(TAG,"Writing data to "+mainActivity.ACCELEROMETER_SENSOR_FILE_NAME);
 
                 writer.close();
             } catch (IOException e) {
